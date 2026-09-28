@@ -508,7 +508,7 @@
           </div>
           <div class="head-actions">
             <button class="curpill" id="curBtn" aria-label="Change display currency">
-              <span id="curPillCode">AUD</span>
+              <span id="curPillCode">USD</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <button class="bell" id="bellBtn" aria-label="Notifications">
@@ -650,7 +650,7 @@
           </div>
           <div>
             <div class="bnum" id="cardNum">BSB 670-864&nbsp;&nbsp;·&nbsp;&nbsp;4827 0153</div>
-            <div class="bname"><span>REBECCA BEACALL</span><span class="pill">AUD</span></div>
+            <div class="bname"><span>EVGENII MINOCHKIN</span><span class="pill" id="cardCurrency">USD</span></div>
           </div>
         </div>
 
@@ -1206,7 +1206,7 @@ const BENDIGO_TX = [
    Two real accounts from the merged statement, switchable from the home header.
    They share one render pipeline; switching rebinds the mutable derived state. */
 const ACCOUNTS = {
-  ubank:   { id:'ubank',   bank:'ubank',        label:'ubank',   sub:'Save account',      bsb:'670-864', acct:'4827 0153',  tx:UBANK_TX, boost:3000000 },
+  ubank:   { id:'ubank',   bank:'ubank',        label:'ubank',   sub:'Save account',      bsb:'670-864', acct:'4827 0153',  tx:UBANK_TX, boost:24342.41 / 0.66 - 31275.30 },
   bendigo: { id:'bendigo', bank:'Bendigo Bank', label:'Bendigo', sub:'Ultimate Account',  bsb:'633-000', acct:'1195 04835', tx:BENDIGO_TX, boost:10000 },
 };
 let activeAcct = 'ubank';   /* resolved from storage at boot, once `store` exists */
@@ -1243,9 +1243,9 @@ const CUR_META = {
   NZD:{symbol:'NZ$', locale:'en-NZ', dec:2, name:'NZ Dollar'},
 };
 const DEFAULT_RATES = { AUD:1, USD:0.66, GBP:0.52, NZD:1.08 };  // 1 AUD = …
-let RATES = (()=>{ try{ return {...DEFAULT_RATES, ...JSON.parse(store.get('ubankRates','{}'))}; }catch(e){ return {...DEFAULT_RATES}; } })();
-let CURRENCY = store.get('ubankCurrency','AUD');
-if(!CUR_META[CURRENCY]) CURRENCY='AUD';
+let RATES = (()=>{ try{ return {...DEFAULT_RATES, ...JSON.parse(store.get('evgeniiRatesUsdV1','{}'))}; }catch(e){ return {...DEFAULT_RATES}; } })();
+let CURRENCY = store.get('evgeniiCurrencyUsdV1','USD');
+if(!CUR_META[CURRENCY]) CURRENCY='USD';
 const rate = ()=> RATES[CURRENCY] || 1;
 
 /* ---- helpers ---- */
@@ -1588,6 +1588,7 @@ function renderCurrencyStatics(){
   document.getElementById('cardTotalIn').textContent = money(allIn,0);
   document.getElementById('cardTotalOut').textContent = money(allOut,0);
   document.getElementById('curPillCode').textContent = CURRENCY;
+  document.getElementById('cardCurrency').textContent = CURRENCY;
 }
 function refreshAll(){
   renderCurrencyStatics();
@@ -1650,8 +1651,8 @@ scrim.addEventListener('click',e=>{ if(e.target===scrim) closeSheet(); });
 document.getElementById('ratesReset').addEventListener('click',()=>{ draftRates={...DEFAULT_RATES}; buildSheet(); });
 document.getElementById('ratesSave').addEventListener('click',()=>{
   CURRENCY=draftCur; RATES={...draftRates}; RATES.AUD=1;
-  store.set('ubankCurrency',CURRENCY);
-  store.set('ubankRates',JSON.stringify(RATES));
+  store.set('evgeniiCurrencyUsdV1',CURRENCY);
+  store.set('evgeniiRatesUsdV1',JSON.stringify(RATES));
   closeSheet();
   refreshAll();
 });
